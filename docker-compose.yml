@@ -1,0 +1,55 @@
+version: "3.7"
+
+networks:
+  ktj:
+
+volumes:
+  pgdata:
+
+services:
+  frontend:
+    build:
+      context: ./ktj-frontend
+    ports:
+     - "80:80"
+     - "8000:8000"
+    networks:
+      - ktj
+    depends_on:
+      - backend
+
+  redis:
+    image: "redis:alpine"
+    networks:
+      - ktj
+    ports:
+      - "6379:6379"
+
+  backend:
+    build:
+      context: ./ktj-backend
+    networks:
+      - ktj
+    ports:
+        - "8080:8080"
+    depends_on:
+      - database
+
+  database:
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: oskariadm
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    build:
+      context: ./ktj-database
+    networks:
+      - ktj
+    ports:
+      - "5432:5432"
+
+
+
+
+
